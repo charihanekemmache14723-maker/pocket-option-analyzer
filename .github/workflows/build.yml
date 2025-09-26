@@ -27,8 +27,7 @@ jobs:
       run: pyinstaller --onefile --windowed main.py
 
     - name: Upload EXE artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: PocketOptionApp
         path: dist/main.exe
-
