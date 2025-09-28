@@ -29,6 +29,7 @@ jobs:
     - name: Upload EXE artifact
       uses: actions/upload-artifact@v4
       with:
-        name: PocketOptionApp
+  # Trigger rebuild
+      name: PocketOptionApp
         path: dist/main.exe
 # Trigger rebuild
