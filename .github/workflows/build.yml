@@ -31,3 +31,4 @@ jobs:
       with:
         name: PocketOptionApp
         path: dist/main.exe
+# Trigger rebuild
