@@ -1,87 +1,79 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext, ttk
+from tkinter import filedialog
+import requests
 import json
-from datetime import datetime
+from PIL import Image, ImageTk
+from io import BytesIO
 
-class PocketOptionAnalyzer:
-    def __init__(self):
-        self.signals = []
+# ==============================
+# إعداد رابط الـ API الخاص بـ Hugging Face
+# ==============================
+API_URL = "https://charihanekemmache14723-pocket-option-analyzer-api.hf.space/api/predict/"
 
-    def dummy_analysis(self, file_path):
-        # هذه فقط محاكاة – لاحقاً ممكن نضيف التحليل الحقيقي
-        self.signals = [
-            {
-                "signal_type": "CALL",
-                "confidence": 0.82,
-                "entry_price": 1.2345,
-                "recommended_expiry": "5 دقائق",
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            }
-        ]
-        return True
+def send_image_to_api(image_path):
+    """
+    يرسل الصورة إلى API ويعيد الاستجابة على شكل JSON
+    """
+    try:
+        with open(image_path, "rb") as img_file:
+            response = requests.post(API_URL, files={"files": img_file})
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"error": f"HTTP {response.status_code}", "details": response.text}
+    except Exception as e:
+        return {"error": str(e)}
 
+# ==============================
+# واجهة المستخدم
+# ==============================
+def select_image():
+    global img_path, img_display
+    img_path = filedialog.askopenfilename(filetypes=[("Images", "*.png;*.jpg;*.jpeg")])
+    if img_path:
+        img = Image.open(img_path)
+        img = img.resize((300, 200))
+        img_display = ImageTk.PhotoImage(img)
+        img_label.config(image=img_display)
+        status_label.config(text="✅ صورة جاهزة للتحليل")
 
-class PocketOptionGUI:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Pocket Option Analyzer")
-        self.root.geometry("700x500")
-        self.analyzer = PocketOptionAnalyzer()
-        self.create_widgets()
+def analyze_image():
+    if not img_path:
+        status_label.config(text="❌ الرجاء اختيار صورة أولاً")
+        return
 
-    def create_widgets(self):
-        frame = tk.Frame(self.root)
-        frame.pack(pady=10)
+    status_label.config(text="⏳ جاري إرسال الصورة إلى السيرفر...")
+    root.update()
 
-        upload_btn = tk.Button(frame, text="📁 اختر صورة", command=self.load_image)
-        upload_btn.pack(side="left", padx=5)
+    result = send_image_to_api(img_path)
 
-        analyze_btn = tk.Button(frame, text="🔍 تحليل", command=self.run_analysis)
-        analyze_btn.pack(side="left", padx=5)
+    if "error" in result:
+        result_text.delete("1.0", tk.END)
+        result_text.insert(tk.END, f"❌ خطأ: {result['error']}\n{result.get('details', '')}")
+    else:
+        result_text.delete("1.0", tk.END)
+        result_text.insert(tk.END, json.dumps(result, indent=4, ensure_ascii=False))
+        status_label.config(text="✅ التحليل مكتمل")
 
-        save_btn = tk.Button(frame, text="💾 حفظ النتائج", command=self.save_results)
-        save_btn.pack(side="left", padx=5)
+# ==============================
+# تصميم الواجهة
+# ==============================
+root = tk.Tk()
+root.title("Pocket Option Analyzer (Online)")
 
-        self.results_text = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, height=20)
-        self.results_text.pack(fill="both", expand=True, padx=10, pady=10)
+img_path = None
 
-    def load_image(self):
-        self.file_path = filedialog.askopenfilename(
-            title="اختر صورة", filetypes=[("Image files", "*.png *.jpg *.jpeg")]
-        )
-        if self.file_path:
-            messagebox.showinfo("تم", f"تم اختيار الصورة: {self.file_path}")
+tk.Button(root, text="📁 اختر صورة", command=select_image).pack(pady=10)
+tk.Button(root, text="🔍 تحليل الصورة", command=analyze_image).pack(pady=10)
 
-    def run_analysis(self):
-        if not hasattr(self, "file_path"):
-            messagebox.showwarning("تحذير", "اختر صورة أولاً")
-            return
-        if self.analyzer.dummy_analysis(self.file_path):
-            self.display_results()
+img_label = tk.Label(root)
+img_label.pack()
 
-    def display_results(self):
-        self.results_text.delete(1.0, tk.END)
-        for signal in self.analyzer.signals:
-            self.results_text.insert(tk.END, f"🚨 إشارة جديدة:\n")
-            self.results_text.insert(tk.END, f"• النوع: {signal['signal_type']}\n")
-            self.results_text.insert(tk.END, f"• الثقة: {signal['confidence']:.1%}\n")
-            self.results_text.insert(tk.END, f"• سعر الدخول: {signal['entry_price']:.4f}\n")
-            self.results_text.insert(tk.END, f"• المدة: {signal['recommended_expiry']}\n")
-            self.results_text.insert(tk.END, f"• الوقت: {signal['timestamp']}\n\n")
+result_text = tk.Text(root, height=15, width=50)
+result_text.pack()
 
-    def save_results(self):
-        if not self.analyzer.signals:
-            messagebox.showwarning("تحذير", "لا توجد نتائج لحفظها")
-            return
-        filename = f"signals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(self.analyzer.signals, f, ensure_ascii=False, indent=2)
-        messagebox.showinfo("تم", f"تم حفظ النتائج في {filename}")
+status_label = tk.Label(root, text="🟢 جاهز")
+status_label.pack()
 
-    def run(self):
-        self.root.mainloop()
-
-
-if __name__ == "__main__":
-    gui = PocketOptionGUI()
-    gui.run()
+root.mainloop()
