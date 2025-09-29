@@ -23,13 +23,14 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Build EXE
-      run: pyinstaller --onefile --windowed main.py
+    - name: Build EXE with PyInstaller
+      run: |
+        pyinstaller --onefile --windowed main.py
+        echo "Checking build output..."
+        dir dist
 
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
+    - name: Upload EXE artifact (Fallback to v3 for stability)
+      uses: actions/upload-artifact@v3
       with:
         name: PocketOptionApp
-        path: dist/main.exe
-
-# Trigger rebuild
+        path: dist/**
