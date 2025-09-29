@@ -26,12 +26,12 @@ jobs:
     - name: Build EXE
       run: |
         pyinstaller --onefile --windowed main.py
-        echo "Build complete. Listing dist folder:"
+        echo "✅ Build complete. Contents of dist/:"
         dir dist
 
-    - name: Upload EXE artifact using upload-artifact v4
+    - name: Upload EXE Artifact (v4)
       uses: actions/upload-artifact@v4
       with:
-        name: PocketOptionApp
+        name: PO-Analyzer
         path: dist/**
         if-no-files-found: error
