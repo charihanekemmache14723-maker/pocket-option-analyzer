@@ -10,10 +10,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
@@ -23,14 +23,15 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Build EXE with PyInstaller
+    - name: Build EXE
       run: |
         pyinstaller --onefile --windowed main.py
-        echo "Checking build output..."
+        echo "Build complete. Listing dist folder:"
         dir dist
 
-    - name: Upload EXE artifact (Fallback to v3 for stability)
-      uses: actions/upload-artifact@v3
+    - name: Upload EXE artifact using upload-artifact v4
+      uses: actions/upload-artifact@v4
       with:
         name: PocketOptionApp
         path: dist/**
+        if-no-files-found: error
