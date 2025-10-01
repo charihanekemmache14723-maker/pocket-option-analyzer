@@ -1,6 +1,5 @@
-requests
-Pillow
 gradio_client
+Pillow
 
 
 
