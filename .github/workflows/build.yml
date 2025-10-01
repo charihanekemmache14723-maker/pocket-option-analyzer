@@ -26,7 +26,7 @@ jobs:
       - name: Build EXE
         run: |
           pyinstaller --onefile --windowed main.py
-          echo "Contents of dist folder:"
+          echo "✅ Build complete. Contents of dist/:"
           dir dist
 
       - name: Upload EXE artifact
@@ -35,4 +35,3 @@ jobs:
           name: PO-Analyzer
           path: dist/**
           if-no-files-found: error
-
