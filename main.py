@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 from io import BytesIO
 
 # --- عدّل هذا إلى رابط الـ Space الخاص بك إذا اختلف ---
-API_URL = "https://charihanekemmache14723-pocket-option-ai.hf.space/run/predict"
+API_URL = "https://charihanekemmache14723-pocket-option-analyzer-api.hf.space/run/predict"
 
 def send_image_to_api(image_path):
     try:
