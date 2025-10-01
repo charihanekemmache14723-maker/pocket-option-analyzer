@@ -3,6 +3,22 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 from gradio_client import Client
+import os, sys, shutil
+import gradio_client
+
+# إصلاح مشكلة types.json مع PyInstaller
+def ensure_types_json():
+    try:
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        src = os.path.join(os.path.dirname(gradio_client.__file__), "types.json")
+        dst = os.path.join(base_path, "gradio_client", "types.json")
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        if not os.path.exists(dst):
+            shutil.copy(src, dst)
+    except Exception as e:
+        print("Warning: could not ensure types.json", e)
+
+ensure_types_json()
 
 # عدّل هذا حسب اسم المستخدم واسم المساحة بالضبط:
 # الصيغة: https://<username>-<space-name>.hf.space
