@@ -1,5 +1,6 @@
 requests
 Pillow
+gradio_client
 
 
 
