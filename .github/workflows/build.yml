@@ -34,4 +34,3 @@ jobs:
           name: PO-Analyzer
           path: dist/**
           if-no-files-found: error
-
