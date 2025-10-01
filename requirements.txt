@@ -1,5 +1,6 @@
-gradio_client
 Pillow
+requests
+
 
 
 
