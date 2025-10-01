@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,8 +24,8 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --windowed main.py
-          echo "✅ Build complete. Contents of dist/:"
+          pyinstaller --onefile --windowed --name PO_Analyzer main.py
+          echo "=== dist contents ==="
           dir dist
 
       - name: Upload EXE artifact
